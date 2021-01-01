@@ -1,0 +1,80 @@
+syntax = "proto3";
+package cart;
+
+option java_package = "com.microservices.cart";
+option java_outer_classname = "CartProto";
+
+// Cart represents a user cart corresponding to an user. All items that user wants to buy are added to the cart.
+// This cart object is later used to checkout and create an order.
+message Cart {
+  string id = 1;
+  string userId = 2;
+  string latestSession = 3;
+  repeated CartItem items = 4;
+}
+
+// Cart item is a data structure to group same item in the context of a cart.
+message CartItem{
+  Item item = 1;
+  int64 quantity = 2;
+}
+
+// Item represents a sellable unit in the inventory. They are uniquely identified by their id.
+// Price of the item must be a non-negative number
+message Item{
+  string id = 1;
+  string name = 2;
+  float price = 3;
+}
+
+message User{
+  string id = 1;
+  string session = 2;
+}
+
+message ProcessItemResponse {
+  bool success = 1;
+  string errorCode = 2;
+  string errorMsg = 3;
+  Cart cart = 4;
+}
+
+message AddItemRequest{
+  Item item = 1;
+  User user = 2;
+  string cartId = 3;
+}
+
+// -------------------------------------------------- Service Definition------------------------------------------------
+
+
+service CartService {
+
+  /*
+    SLA Guarantees
+    99th - 300ms
+    95th - 100ms
+    Avg - 30ms
+    Throughout Support - 10K RPM
+    Rate of increase - 2x in 15 minutes
+    Availability - 99.99
+    Consistency - Read after write
+
+    Perf benchmarks - <Link>
+
+    Given an AddItemRequest, adds item to the cart. It returns a ProcessItemResponse that contains the updated cart.
+    If cartId is provided in the request, item is added to that cart if it is active and belongs to the user. If no cartId
+    is provided, item is added to the existing cart for the user. If no cart exists, cart is created and item is added.
+    API may return error response(Item not added) under
+    1. CartId provided doesn't exist or doesn't belong to the user
+    2. User Id or session id is invalid
+    3. Item doesn't exist
+    4. Item is out of stock
+    ....
+    ....
+    ....
+   */
+  rpc AddItem(AddItemRequest) returns (ProcessItemResponse);
+
+}
+
