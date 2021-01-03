@@ -34,7 +34,7 @@ message User{
 
 message ProcessItemResponse {
   bool success = 1;
-  string errorCode = 2;
+  uint64 errorCode = 2; // Mention error code values and scenarios where it would occur
   string errorMsg = 3;
   Cart cart = 4;
 }
@@ -63,13 +63,13 @@ service CartService {
     Perf benchmarks - <Link>
 
     Given an AddItemRequest, adds item to the cart. It returns a ProcessItemResponse that contains the updated cart.
-    If cartId is provided in the request, item is added to that cart if it is active and belongs to the user. If no cartId
-    is provided, item is added to the existing cart for the user. If no cart exists, cart is created and item is added.
-    API may return error response(Item not added) under
+    If no cart exists, cart is created and item is added.
+    API may return error response under
     1. CartId provided doesn't exist or doesn't belong to the user
     2. User Id or session id is invalid
     3. Item doesn't exist
     4. Item is out of stock
+    ....
     ....
     ....
     ....
